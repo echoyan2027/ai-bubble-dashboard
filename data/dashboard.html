@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 泡沫监控仪表盘</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: #0f172a;
+    color: #f1f5f9;
+    min-height: 100vh;
+    padding: 24px;
+    line-height: 1.5;
+}
+
+.container { max-width: 1600px; margin: 0 auto; }
+
+.header {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+h1 { font-size: 28px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; }
+.subtitle { color: #94a3b8; font-size: 14px; margin-bottom: 16px; }
+.eval-date {
+    display: inline-block;
+    background: #334155;
+    color: #94a3b8;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: "Consolas", "Monaco", monospace;
+}
+
+.disclaimer {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: #94a3b8;
+}
+.disclaimer strong { color: #fbbf24; }
+
+.update-info {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-top: 24px;
+}
+
+.update-info h3 {
+    font-size: 16px;
+    color: #cbd5e1;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.update-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.update-card {
+    background: #0f172a;
+    border-radius: 8px;
+    padding: 16px;
+    border-left: 3px solid #60a5fa;
+}
+
+.update-title {
+    color: #f1f5f9;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.update-desc {
+    color: #94a3b8;
+    font-size: 13px;
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.update-desc code {
+    background: #334155;
+    color: #fbbf24;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.update-cmd {
+    background: #1e293b;
+    color: #10b981;
+    font-family: "Consolas", "Monaco", monospace;
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid #334155;
+    display: inline-block;
+}
+
+/* ===== 指数大圆盘 ===== */
+.index-section {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.index-circle-card {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    padding: 32px 24px;
+    text-align: center;
+    box-shadow: 0 0 30px #f59e0b30;
+}
+
+.gauge-container {
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto 16px;
+    padding-bottom: 80px;  /* 给数字预留空间 */
+}
+
+.gauge-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.gauge-score {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    width: 100%;
+}
+
+.gauge-score .value {
+    font-size: 56px;
+    font-weight: 900;
+    line-height: 1;
+    color: #f59e0b;
+}
+
+.gauge-score .label {
+    font-size: 11px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 4px;
+}
+
+.band-label {
+    font-size: 24px;
+    font-weight: 700;
+    color: #f59e0b;
+    margin-bottom: 8px;
+}
+
+.band-advice {
+    color: #cbd5e1;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.weight-coverage {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.index-details-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.index-details-card h2 {
+    font-size: 16px;
+    color: #cbd5e1;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.score-bar-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 80px 60px;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #334155;
+}
+
+.score-bar-row:last-child { border-bottom: none; }
+
+.score-bar-label {
+    color: #cbd5e1;
+    font-size: 13px;
+}
+
+.score-bar-bg {
+    height: 16px;
+    background: #0f172a;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.score-bar-fill {
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.5s;
+}
+
+.score-bar-value {
+    color: #f1f5f9;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: right;
+    font-family: "Consolas", "Monaco", monospace;
+}
+
+.score-bar-weight {
+    color: #64748b;
+    font-size: 11px;
+    text-align: right;
+    font-family: "Consolas", "Monaco", monospace;
+}
+
+/* ===== 5 指标卡片 ===== */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.metric-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+}
+.metric-card.red { border-left: 4px solid #ef4444; }
+.metric-card.yellow { border-left: 4px solid #f59e0b; }
+.metric-card.green { border-left: 4px solid #10b981; }
+.metric-card.gray { border-left: 4px solid #6b7280; }
+
+.metric-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+.metric-name { font-size: 14px; color: #94a3b8; margin-bottom: 4px; }
+.metric-name-en { font-size: 11px; color: #64748b; font-family: "Consolas", "Monaco", monospace; margin-bottom: 8px; }
+.metric-value { font-size: 32px; font-weight: 800; line-height: 1; margin-bottom: 8px; }
+.metric-value .unit { font-size: 16px; color: #94a3b8; font-weight: 500; margin-left: 4px; }
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.status-badge.red { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+.status-badge.yellow { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+.status-badge.green { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+.status-badge.gray { background: rgba(107, 114, 128, 0.2); color: #94a3b8; }
+
+.metric-desc { color: #cbd5e1; font-size: 13px; margin-bottom: 12px; line-height: 1.6; }
+.threshold-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-top: 1px solid #334155;
+    font-size: 12px;
+    color: #94a3b8;
+}
+.threshold-row .label { color: #64748b; }
+
+.chart-container { margin-top: 12px; height: 140px; background: #0f172a; border-radius: 6px; padding: 8px; }
+
+.metric-meta { display: flex; gap: 8px; font-size: 11px; color: #64748b; margin-top: 12px; flex-wrap: wrap; }
+.metric-meta .tag { background: #0f172a; padding: 2px 8px; border-radius: 3px; border: 1px solid #334155; }
+
+/* ===== 历史曲线 + 回测 ===== */
+.history-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.history-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 24px;
+}
+
+.history-card h2 {
+    font-size: 16px;
+    color: #cbd5e1;
+    margin-bottom: 16px;
+}
+
+.history-chart {
+    height: 300px;
+    background: #0f172a;
+    border-radius: 6px;
+    padding: 12px;
+    position: relative;
+}
+
+.history-chart svg {
+    width: 100%;
+    height: 100%;
+}
+
+.backtest-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.backtest-table th, .backtest-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid #334155;
+}
+
+.backtest-table th {
+    color: #94a3b8;
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.backtest-table td { color: #cbd5e1; }
+
+.backtest-table tr.peak td:first-child::before { content: "🔴 "; }
+.backtest-table tr.bottom td:first-child::before { content: "🟢 "; }
+
+.footer {
+    text-align: center;
+    color: #64748b;
+    font-size: 12px;
+    padding: 24px 0;
+    border-top: 1px solid #334155;
+    margin-top: 24px;
+}
+
+@media (max-width: 1100px) {
+    .index-section { grid-template-columns: 1fr; }
+    .history-section { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📊 AI 泡沫监控仪表盘</h1>
+        <div class="subtitle">5 个 DIY 指标 · 实时盯盘 · 撤退信号自动提示</div>
+        <span class="eval-date">最后更新: 2026-06-21</span>
+    </div>
+
+    <div class="disclaimer">
+        <strong>⚠️ 操作规则:</strong>
+        0-100 指数分 · 🟢 0-20 恐慌/低估 · 🔵 20-40 中性 · 🟡 40-60 警觉 · 🟠 60-80 泡沫 · 🔴 80-100 极度泡沫。
+        <strong>指数 ≥ 80 减仓 / ≥ 90 清仓</strong>。
+        本仪表盘仅供研究参考，<strong>不构成投资建议</strong>。
+    </div>
+
+    <!-- ===== 指数大圆盘 (半圆 gauge) ===== -->
+    <div class="index-section">
+        <div class="index-circle-card">
+            <div class="gauge-container">
+                <svg class="gauge-svg" viewBox="0 0 320 180" preserveAspectRatio="xMidYMid meet">
+                    <defs>
+                        <!-- 主渐变：5 段颜色 (绿 → 蓝 → 黄 → 橙 → 红) -->
+                        <linearGradient id="gauge-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%"   stop-color="#10b981"/>
+                            <stop offset="25%"  stop-color="#3b82f6"/>
+                            <stop offset="50%"  stop-color="#f59e0b"/>
+                            <stop offset="75%"  stop-color="#ea580c"/>
+                            <stop offset="100%" stop-color="#dc2626"/>
+                        </linearGradient>
+                        <!-- 指针阴影 -->
+                        <filter id="needle-shadow" x="-50%" y="-50%" width="200%" height="200%">
+                            <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.5"/>
+                        </filter>
+                    </defs>
+
+                    <!-- 背景半圆 (深色) -->
+                    <path d="M 40 140 A 100 100 0 0 1 280 140"
+                          fill="none" stroke="#1e293b" stroke-width="22"/>
+
+                    <!-- 渐变半圆 (实色，从左 0% 到右 100%) -->
+                    <path d="M 40 140 A 100 100 0 0 1 280 140"
+                          fill="none" stroke="url(#gauge-grad)" stroke-width="22" stroke-linecap="round"/>
+
+                    <!-- 5 段分隔线 (刻度 20/40/60/80) -->
+                    <line x1="48" y1="140" x2="55" y2="140" stroke="#0f172a" stroke-width="2"/>
+                    <line x1="81" y1="79" x2="86" y2="73" stroke="#0f172a" stroke-width="2"/>
+                    <line x1="160" y1="40" x2="160" y2="47" stroke="#0f172a" stroke-width="2"/>
+                    <line x1="239" y1="79" x2="234" y2="73" stroke="#0f172a" stroke-width="2"/>
+                    <line x1="272" y1="140" x2="265" y2="140" stroke="#0f172a" stroke-width="2"/>
+
+                    <!-- 刻度数字 0/25/50/75/100 -->
+                    <text x="32" y="160" fill="#64748b" font-size="11" text-anchor="middle">0</text>
+                    <text x="76" y="66" fill="#64748b" font-size="11" text-anchor="middle">25</text>
+                    <text x="160" y="30" fill="#64748b" font-size="11" text-anchor="middle">50</text>
+                    <text x="244" y="66" fill="#64748b" font-size="11" text-anchor="middle">75</text>
+                    <text x="288" y="160" fill="#64748b" font-size="11" text-anchor="middle">100</text>
+
+                    <!-- 档位标签 (沿弧外) -->
+                    <text x="80" y="85" fill="#10b981" font-size="9" text-anchor="middle" opacity="0.7">恐慌</text>
+                    <text x="240" y="85" fill="#dc2626" font-size="9" text-anchor="middle" opacity="0.7">泡沫</text>
+                    <text x="160" y="58" fill="#3b82f6" font-size="9" text-anchor="middle" opacity="0.7">中性</text>
+
+                    <!-- 指针: 旋转 = score*1.8 - 90, score 0 时指左 (-90°), score 100 时指右 (+90°) -->
+                    <g id="gauge-needle" transform="rotate(-90 160 140)" filter="url(#needle-shadow)">
+                        <line x1="160" y1="140" x2="160" y2="55" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round"/>
+                        <line x1="160" y1="140" x2="160" y2="55" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round"/>
+                        <circle cx="160" cy="140" r="8" fill="#1e293b" stroke="#fbbf24" stroke-width="2.5"/>
+                        <circle cx="160" cy="140" r="3" fill="#fbbf24"/>
+                    </g>
+                </svg>
+                <div class="gauge-score">
+                    <div class="value">52.8</div>
+                    <div class="label">泡沫指数</div>
+                </div>
+            </div>
+            <div class="band-label">🟡 警觉</div>
+            <div class="band-advice">分批减仓</div>
+            <div class="weight-coverage">指标覆盖: 100%</div>
+        </div>
+
+        <div class="index-details-card">
+            <h2>📈 指标评分明细 (按权重贡献)</h2>
+            <div id="score-details"></div>
+        </div>
+    </div>
+
+    <!-- ===== 5 指标卡片 ===== -->
+    <h2 style="color: #cbd5e1; margin-bottom: 16px; font-size: 18px;">🔍 5 个核心指标 (实时盯盘)</h2>
+    <div class="metrics-grid" id="metrics-grid"></div>
+
+    <!-- 回测图已删除（5 指标 vs 2 指标回测数据口径不一致，无对比意义） -->
+
+    <!-- ===== 数据更新说明 ===== -->
+    <div class="update-info">
+        <h3>📡 数据更新方式</h3>
+        <div class="update-grid">
+            <div class="update-card">
+                <div class="update-title">🖥️ 本地运行</div>
+                <div class="update-desc">在项目目录双击 <code>run.bat</code> 即可：拉取最新数据 → 重新渲染仪表盘 → 自动打开浏览器</div>
+                <div class="update-cmd">run.bat</div>
+            </div>
+            <div class="update-card">
+                <div class="update-title">☁️ GitHub Pages 部署</div>
+                <div class="update-desc">通过 <code>.github/workflows/update.yml</code> 每周自动跑 Python 更新，<strong>无需手动操作</strong></div>
+                <div class="update-cmd">Schedule: 周一 09:00 UTC</div>
+            </div>
+            <div class="update-card">
+                <div class="update-title">📝 手动数据源</div>
+                <div class="update-desc">FINRA 保证金 / OpenInsider 偶尔需要手工补，命令：</div>
+                <div class="update-cmd">python manual_input.py finra-margin 2025-09 815000</div>
+            </div>
+        </div>
+        <div class="last-update" style="margin-top: 16px; text-align: center; color: #64748b; font-size: 12px;">
+            💡 提示: 如果数据看起来陈旧，在 GitHub repo 点 "Actions" → "Update AI Bubble Dashboard" → "Run workflow" 强制刷新
+        </div>
+    </div>
+
+    <div class="footer">
+
+    <div class="footer">
+        AI 泡沫监控仪表盘 v2.0 · 数据源: SEC EDGAR / Yale Shiller / RunPod + Paperspace / OpenInsider<br>
+        仅供研究参考, 不构成投资建议
+    </div>
+</div>
+
+<script>
+const metrics = [{"metric_key": "capex_revenue", "name_zh": "Mag 4 Capex / AI 收入比", "name_en": "Mag 4 Capex / AI Revenue", "unit": "x", "alert_value": 2.5, "danger_value": 4.0, "dotcom_peak": 6.0, "source": "SEC EDGAR", "direction": "lower_is_better", "update_freq": "quarterly", "category": "fundamental", "desc": "MSFT/AMZN/GOOGL/META 四家 hyperscaler 季度资本开支合计除以估算的 AI 业务收入。AI 业务收入按 Mag 4 总收入 13% 估算 (Menlo 2025 / 拾象报告口径)，不直接等于公司细分披露的 AI 业务实际收入。", "value": 2.5738223057657152, "obs_date": "2025-12-31", "obs_period": "2025Q4", "status": "yellow", "source_url": "sec_edgar_auto"}, {"metric_key": "shiller_cape", "name_zh": "Shiller CAPE (10 年平滑市盈率)", "name_en": "Shiller CAPE", "unit": "x", "alert_value": 35.0, "danger_value": 40.0, "dotcom_peak": 44.0, "source": "Yale Shiller 公开数据", "direction": "lower_is_better", "update_freq": "daily", "category": "market", "desc": "S&P 500 指数除以 10 年平滑通胀调整后的实际 EPS。Robert Shiller 1988 年首次提出。>25x 长期均值，>35x 历史前 10%，>40x 仅 2000 年前后出现过。", "value": 41.71, "obs_date": "2026-06-01", "obs_period": null, "status": "red", "source_url": "estimate_2023plus"}, {"metric_key": "mag7_concentration", "name_zh": "Mag 7 占 S&P 500 权重", "name_en": "Mag 7 / S&P 500 Weight", "unit": "%", "alert_value": 30.0, "danger_value": 33.0, "dotcom_peak": 18.0, "source": "yfinance 实时市值", "direction": "lower_is_better", "update_freq": "daily", "category": "market", "desc": "AAPL/MSFT/GOOGL/AMZN/META/NVDA/TSLA 总市值除以 S&P 500 总市值。当前 32% 处于历史前 1% 区间。", "value": 32.4, "obs_date": "2026-06-21", "obs_period": null, "status": "yellow", "source_url": "S&P Dow Jones (估算)"}, {"metric_key": "semiconductor_proxy", "name_zh": "SOX 半导体指数 月环比", "name_en": "PHLX Semiconductor MoM", "unit": "%", "alert_value": 5.0, "danger_value": 10.0, "dotcom_peak": 15.0, "source": "yfinance ^SOX (本地缓存: data/manual/sox_history.json)", "direction": "lower_is_better", "update_freq": "monthly", "category": "fundamental", "desc": "费城半导体指数 (^SOX) 月末收盘价的月度变化率。SOX 包含 NVDA/AMD/AVGO/ASML/MU/QCOM 等半导体龙头。分档: -5%~+5% 中性 (健康)，+5%~+10% 投机升温 (警觉)，>+10% 投机过热 (危险)。", "value": -1.0852713178294573, "obs_date": "2026-06-19", "obs_period": "MoM-2026-06", "status": "green", "source_url": "computed_from_history"}, {"metric_key": "insider_sell_ratio", "name_zh": "Mag 7 内部人 6M 卖/买比", "name_en": "Mag 7 Insider Sell/Buy Ratio (6M)", "unit": "x", "alert_value": 3.0, "danger_value": 5.0, "dotcom_peak": 4.0, "source": "OpenInsider / SEC Form 4", "direction": "lower_is_better", "update_freq": "monthly", "category": "sentiment", "desc": "Mag 7 全部 6 个月滚动窗口内部人卖出金额除以买入金额。比值 1.0 持平，>3.0 内部人净卖出显著，>5.0 接近历史极端水平 (2007/2021 顶峰)。", "value": 3.2, "obs_date": "2026-04-30", "obs_period": null, "status": "yellow", "source_url": "openinsider 估算"}];
+const chartData = [{"key": "capex_revenue", "name_zh": "Mag 4 Capex / AI 收入比", "history": [{"date": "2021-06-30", "value": 0.9493438345226395}, {"date": "2021-09-30", "value": 1.0058275477424592}, {"date": "2021-12-31", "value": 0.9438903463778016}, {"date": "2022-03-31", "value": 1.0411559608703793}, {"date": "2022-06-30", "value": 1.0477602513831596}, {"date": "2022-09-30", "value": 1.1035288107141554}, {"date": "2022-12-31", "value": 0.9797298302734134}, {"date": "2023-03-31", "value": 0.7848242927850047}, {"date": "2023-06-30", "value": 0.8650662337366513}, {"date": "2023-09-30", "value": 0.9155025377213954}, {"date": "2023-12-31", "value": 0.9214835253752445}, {"date": "2024-03-31", "value": 0.8363497641203584}, {"date": "2024-06-30", "value": 1.2081191679311243}, {"date": "2024-09-30", "value": 1.2815178787005943}, {"date": "2024-12-31", "value": 1.383256966957791}, {"date": "2025-03-31", "value": 1.226876079514832}, {"date": "2025-06-30", "value": 2.3274282110800097}, {"date": "2025-09-30", "value": 2.420817773552458}, {"date": "2025-12-31", "value": 2.5738223057657152}], "alert": 2.5, "danger": 4.0, "dotcom_peak": 6.0, "current_value": 2.5738223057657152, "unit": "x", "direction": "lower_is_better"}, {"key": "shiller_cape", "name_zh": "Shiller CAPE (10 年平滑市盈率)", "history": [{"date": "2011-07-01", "value": 22.610981701156625}, {"date": "2011-08-01", "value": 20.049852721660496}, {"date": "2011-09-01", "value": 19.69811456887771}, {"date": "2011-10-01", "value": 20.155824786688747}, {"date": "2011-11-01", "value": 20.34524679764582}, {"date": "2011-12-01", "value": 20.523575499431697}, {"date": "2012-01-01", "value": 21.213008091803452}, {"date": "2012-02-01", "value": 21.79743596371753}, {"date": "2012-03-01", "value": 22.053943972904708}, {"date": "2012-04-01", "value": 21.779246906824888}, {"date": "2012-05-01", "value": 20.941467419743475}, {"date": "2012-06-01", "value": 20.547504086856083}, {"date": "2012-07-01", "value": 20.999341293380557}, {"date": "2012-08-01", "value": 21.410428453442933}, {"date": "2012-09-01", "value": 21.783690301727678}, {"date": "2012-10-01", "value": 21.577109654528787}, {"date": "2012-11-01", "value": 20.898162059573696}, {"date": "2012-12-01", "value": 21.23826113984562}, {"date": "2013-01-01", "value": 21.900475413821813}, {"date": "2013-02-01", "value": 22.05272433686195}, {"date": "2013-03-01", "value": 22.419207114602578}, {"date": "2013-04-01", "value": 22.59565539610559}, {"date": "2013-05-01", "value": 23.41184178184241}, {"date": "2013-06-01", "value": 22.925333173915337}, {"date": "2013-07-01", "value": 23.492460177159643}, {"date": "2013-08-01", "value": 23.3566490949161}, {"date": "2013-09-01", "value": 23.442287167960608}, {"date": "2013-10-01", "value": 23.834737887631437}, {"date": "2013-11-01", "value": 24.642077092412066}, {"date": "2013-12-01", "value": 24.861869296461947}, {"date": "2014-01-01", "value": 24.859609093632724}, {"date": "2014-02-01", "value": 24.59093087789414}, {"date": "2014-03-01", "value": 24.95603915396539}, {"date": "2014-04-01", "value": 24.78631539696264}, {"date": "2014-05-01", "value": 24.943274109902593}, {"date": "2014-06-01", "value": 25.558007623511294}, {"date": "2014-07-01", "value": 25.817545976158748}, {"date": "2014-08-01", "value": 25.6176064217994}, {"date": "2014-09-01", "value": 25.918436892606202}, {"date": "2014-10-01", "value": 25.16274828308326}, {"date": "2014-11-01", "value": 26.60681714714343}, {"date": "2014-12-01", "value": 26.794085482572566}, {"date": "2015-01-01", "value": 26.492295420383137}, {"date": "2015-02-01", "value": 26.99551369938325}, {"date": "2015-03-01", "value": 26.728605452928488}, {"date": "2015-04-01", "value": 26.791371680192338}, {"date": "2015-05-01", "value": 26.806111379650833}, {"date": "2015-06-01", "value": 26.495895292784848}, {"date": "2015-07-01", "value": 26.381136336399692}, {"date": "2015-08-01", "value": 25.693658417057698}, {"date": "2015-09-01", "value": 24.496752170486435}, {"date": "2015-10-01", "value": 25.491441046066747}, {"date": "2015-11-01", "value": 26.22585189097193}, {"date": "2015-12-01", "value": 25.965424037124176}, {"date": "2016-01-01", "value": 24.206167203878476}, {"date": "2016-02-01", "value": 24.00260677728976}, {"date": "2016-03-01", "value": 25.372298620187912}, {"date": "2016-04-01", "value": 25.922337543673883}, {"date": "2016-05-01", "value": 25.694709923449977}, {"date": "2016-06-01", "value": 25.84037292767051}, {"date": "2016-07-01", "value": 26.694003256096302}, {"date": "2016-08-01", "value": 26.948872433723864}, {"date": "2016-09-01", "value": 26.72787334647854}, {"date": "2016-10-01", "value": 26.525143085070596}, {"date": "2016-11-01", "value": 26.85095353105626}, {"date": "2016-12-01", "value": 27.865098223923525}, {"date": "2017-01-01", "value": 28.06357374212446}, {"date": "2017-02-01", "value": 28.655106525184127}, {"date": "2017-03-01", "value": 29.086921742464643}, {"date": "2017-04-01", "value": 28.904245956275155}, {"date": "2017-05-01", "value": 29.31334498027143}, {"date": "2017-06-01", "value": 29.748503240632747}, {"date": "2017-07-01", "value": 30.00222074401856}, {"date": "2017-08-01", "value": 29.914959397497487}, {"date": "2017-09-01", "value": 30.168114410678903}, {"date": "2017-10-01", "value": 30.920393290333838}, {"date": "2017-11-01", "value": 31.298913333880268}, {"date": "2017-12-01", "value": 32.086132007706}, {"date": "2018-01-01", "value": 33.30734382803066}, {"date": "2018-02-01", "value": 32.03538233925029}, {"date": "2018-03-01", "value": 31.80840905764312}, {"date": "2018-04-01", "value": 30.97017929332522}, {"date": "2018-05-01", "value": 31.243615074864607}, {"date": "2018-06-01", "value": 31.6305564964546}, {"date": "2018-07-01", "value": 31.886366962158977}, {"date": "2018-08-01", "value": 32.390276880301116}, {"date": "2018-09-01", "value": 32.622891120500185}, {"date": "2018-10-01", "value": 31.0379610780065}, {"date": "2018-11-01", "value": 30.195583406705246}, {"date": "2018-12-01", "value": 28.291857012072875}, {"date": "2019-01-01", "value": 28.38016446354758}, {"date": "2019-02-01", "value": 29.541548965131213}, {"date": "2019-03-01", "value": 29.576196014784816}, {"date": "2019-04-01", "value": 30.13351717138751}, {"date": "2019-05-01", "value": 29.242030936939845}, {"date": "2019-06-01", "value": 29.283796275306262}, {"date": "2019-07-01", "value": 29.98668533504252}, {"date": "2019-08-01", "value": 28.705397371833072}, {"date": "2019-09-01", "value": 29.22952023303527}, {"date": "2019-10-01", "value": 28.841122881953403}, {"date": "2019-11-01", "value": 29.836867659083424}, {"date": "2019-12-01", "value": 30.331822322243287}, {"date": "2020-01-01", "value": 30.985220300230694}, {"date": "2020-02-01", "value": 30.729689264735743}, {"date": "2020-03-01", "value": 24.817168629099413}, {"date": "2020-04-01", "value": 25.927358825280162}, {"date": "2020-05-01", "value": 27.328480997698456}, {"date": "2020-06-01", "value": 28.838315955122845}, {"date": "2020-07-01", "value": 29.599194927666993}, {"date": "2020-08-01", "value": 31.15820896535522}, {"date": "2020-09-01", "value": 30.83942604381124}, {"date": "2020-10-01", "value": 31.28369403259284}, {"date": "2020-11-01", "value": 32.47320409661256}, {"date": "2020-12-01", "value": 33.7655914181171}, {"date": "2021-01-01", "value": 34.5124322941069}, {"date": "2021-02-01", "value": 35.103907171969816}, {"date": "2021-03-01", "value": 35.04254511219207}, {"date": "2021-04-01", "value": 36.719814109133}, {"date": "2021-05-01", "value": 36.55213398979905}, {"date": "2021-06-01", "value": 36.696258013088354}, {"date": "2021-07-01", "value": 37.443383184615385}, {"date": "2021-08-01", "value": 37.973500614070474}, {"date": "2021-09-01", "value": 37.62034668665119}, {"date": "2021-10-01", "value": 37.2530250003253}, {"date": "2021-11-01", "value": 38.5826274977192}, {"date": "2021-12-01", "value": 38.30484987346744}, {"date": "2022-01-01", "value": 36.936758070297444}, {"date": "2022-02-01", "value": 35.28714922569486}, {"date": "2022-03-01", "value": 34.270798693291724}, {"date": "2022-04-01", "value": 33.88916475591384}, {"date": "2022-05-01", "value": 30.67315507954513}, {"date": "2022-06-01", "value": 29.047721395103835}, {"date": "2022-07-01", "value": 29.00461831720893}, {"date": "2022-08-01", "value": 30.69876336517529}, {"date": "2022-09-01", "value": 28.22988465582196}, {"date": "2022-10-01", "value": 27.08076692540069}, {"date": "2022-11-01", "value": 28.378949016273314}, {"date": "2022-12-01", "value": 28.316901284527283}, {"date": "2023-01-01", "value": 28.334813423755683}, {"date": "2023-02-01", "value": 28.91976294386663}, {"date": "2023-03-01", "value": 27.953041469070055}, {"date": "2023-04-01", "value": 28.76468407710037}, {"date": "2023-05-01", "value": 28.761805827303075}, {"date": "2023-06-01", "value": 29.939593027231528}, {"date": "2023-07-01", "value": 30.8909260883331}, {"date": "2023-08-01", "value": 30.469742507138623}, {"date": "2023-09-01", "value": 30.810960610791547}, {"date": "2023-10-01", "value": 30.4}, {"date": "2023-11-01", "value": 30.8}, {"date": "2023-12-01", "value": 32.1}, {"date": "2024-01-01", "value": 33.2}, {"date": "2024-02-01", "value": 34.5}, {"date": "2024-03-01", "value": 35.1}, {"date": "2024-04-01", "value": 35.8}, {"date": "2024-05-01", "value": 36.2}, {"date": "2024-06-01", "value": 36.8}, {"date": "2024-07-01", "value": 36.5}, {"date": "2024-08-01", "value": 36.0}, {"date": "2024-09-01", "value": 35.7}, {"date": "2024-10-01", "value": 35.9}, {"date": "2024-11-01", "value": 36.8}, {"date": "2024-12-01", "value": 37.5}, {"date": "2025-01-01", "value": 38.2}, {"date": "2025-02-01", "value": 38.8}, {"date": "2025-03-01", "value": 36.5}, {"date": "2025-04-01", "value": 35.2}, {"date": "2025-05-01", "value": 36.8}, {"date": "2025-06-01", "value": 37.5}, {"date": "2025-07-01", "value": 38.4}, {"date": "2025-08-01", "value": 39.2}, {"date": "2025-09-01", "value": 39.5}, {"date": "2025-10-01", "value": 40.1}, {"date": "2025-11-01", "value": 40.8}, {"date": "2025-12-01", "value": 41.0}, {"date": "2026-01-01", "value": 41.2}, {"date": "2026-02-01", "value": 41.0}, {"date": "2026-03-01", "value": 40.5}, {"date": "2026-04-01", "value": 41.0}, {"date": "2026-05-01", "value": 41.3}, {"date": "2026-06-01", "value": 41.71}], "alert": 35.0, "danger": 40.0, "dotcom_peak": 44.0, "current_value": 41.71, "unit": "x", "direction": "lower_is_better"}, {"key": "mag7_concentration", "name_zh": "Mag 7 占 S&P 500 权重", "history": [{"date": "2020-01-31", "value": 22.0}, {"date": "2020-07-31", "value": 24.5}, {"date": "2021-01-31", "value": 26.8}, {"date": "2021-07-31", "value": 27.5}, {"date": "2022-01-31", "value": 28.2}, {"date": "2022-07-31", "value": 25.5}, {"date": "2023-01-31", "value": 27.0}, {"date": "2023-07-31", "value": 28.8}, {"date": "2024-01-31", "value": 29.5}, {"date": "2024-07-31", "value": 30.2}, {"date": "2025-01-31", "value": 30.8}, {"date": "2025-07-31", "value": 31.5}, {"date": "2026-01-31", "value": 32.0}, {"date": "2026-06-21", "value": 32.4}], "alert": 30.0, "danger": 33.0, "dotcom_peak": 18.0, "current_value": 32.4, "unit": "%", "direction": "lower_is_better"}, {"key": "semiconductor_proxy", "name_zh": "SOX 半导体指数 月环比", "history": [{"date": "2020-02-28", "value": -9.465833059120332}, {"date": "2020-03-31", "value": -10.025442209837655}, {"date": "2020-04-30", "value": 14.603110482730768}, {"date": "2020-05-29", "value": 7.484431911643746}, {"date": "2020-06-30", "value": 0.09838216003499028}, {"date": "2020-07-31", "value": 11.25368570492519}, {"date": "2020-08-31", "value": 10.203680981595097}, {"date": "2020-09-30", "value": -4.1818829607196975}, {"date": "2020-10-31", "value": 1.5709969788519722}, {"date": "2020-11-30", "value": 15.229030339083865}, {"date": "2020-12-31", "value": 8.573924784559791}, {"date": "2021-01-31", "value": 7.289685442574988}, {"date": "2021-02-26", "value": -1.759110898987501}, {"date": "2021-03-31", "value": 4.903355658118478}, {"date": "2021-04-30", "value": 3.678465100893147}, {"date": "2021-05-28", "value": -0.9157041669325449}, {"date": "2021-06-30", "value": 4.079858315891155}, {"date": "2021-07-30", "value": 0.8817523668089846}, {"date": "2021-08-31", "value": 2.3154537369276538}, {"date": "2021-09-30", "value": -4.496133325340208}, {"date": "2021-10-29", "value": 11.731843575419001}, {"date": "2021-11-30", "value": 5.550561797752806}, {"date": "2021-12-31", "value": 5.977219501809664}, {"date": "2022-01-31", "value": -10.97885590879413}, {"date": "2022-02-28", "value": -2.059238363892807}, {"date": "2022-03-31", "value": 0.8726958525345675}, {"date": "2022-04-29", "value": -11.498158353082268}, {"date": "2022-05-31", "value": -1.338882436443412}, {"date": "2022-06-30", "value": -14.247408521631073}, {"date": "2022-07-29", "value": 10.776388041488708}, {"date": "2022-08-31", "value": -1.9414802065404506}, {"date": "2022-09-30", "value": -13.202976900933788}, {"date": "2022-10-31", "value": 6.167846309403438}, {"date": "2022-11-30", "value": 8.799999999999999}, {"date": "2022-12-30", "value": -12.219887955182072}, {"date": "2023-01-31", "value": 14.890307140007986}, {"date": "2023-02-28", "value": -1.9164670346838966}, {"date": "2023-03-31", "value": 10.102297263813673}, {"date": "2023-04-28", "value": -7.008519530622087}, {"date": "2023-05-31", "value": 14.993949870354358}, {"date": "2023-06-30", "value": 3.4333473633575937}, {"date": "2023-07-31", "value": 6.150447622369489}, {"date": "2023-08-31", "value": -0.7228915662650627}, {"date": "2023-09-29", "value": -7.932480141218003}, {"date": "2023-10-31", "value": -7.489514679448773}, {"date": "2023-11-30", "value": 19.96437823834197}, {"date": "2023-12-29", "value": 9.321095964367666}, {"date": "2024-01-31", "value": 3.264358733764626}, {"date": "2024-02-29", "value": 7.068388330942142}, {"date": "2024-03-29", "value": 2.420939789172763}, {"date": "2024-04-30", "value": -2.9720889664195416}, {"date": "2024-05-31", "value": 8.771377845697467}, {"date": "2024-06-28", "value": 6.008264462809921}, {"date": "2024-07-31", "value": -6.182271770484131}, {"date": "2024-08-30", "value": -3.8058833305634185}, {"date": "2024-09-30", "value": 5.880701451278512}, {"date": "2024-10-31", "value": 2.500662900034682}, {"date": "2024-11-29", "value": 0.4059459136767881}, {"date": "2024-12-31", "value": 1.1673305983312632}, {"date": "2025-01-31", "value": 2.85624730635112}, {"date": "2025-02-28", "value": -6.864238915130269}, {"date": "2025-03-31", "value": -6.186094069529653}, {"date": "2025-04-30", "value": 4.861035422343325}, {"date": "2025-05-30", "value": 9.136264421577799}, {"date": "2025-06-30", "value": 8.285714285714285}, {"date": "2025-07-31", "value": 0.9674582233948988}, {"date": "2025-08-29", "value": -2.7874564459930316}, {"date": "2025-09-30", "value": 5.913978494623656}, {"date": "2025-10-31", "value": 1.8612521150592216}, {"date": "2025-11-28", "value": -3.488372093023256}, {"date": "2025-12-31", "value": 4.044750430292599}, {"date": "2026-01-30", "value": 2.2332506203473943}, {"date": "2026-02-27", "value": -2.5889967637540456}, {"date": "2026-03-31", "value": -1.1627906976744187}, {"date": "2026-04-30", "value": 4.873949579831933}, {"date": "2026-05-29", "value": 3.3653846153846154}, {"date": "2026-06-19", "value": -1.0852713178294573}], "alert": 5.0, "danger": 10.0, "dotcom_peak": 15.0, "current_value": -1.0852713178294573, "unit": "%", "direction": "lower_is_better"}, {"key": "insider_sell_ratio", "name_zh": "Mag 7 内部人 6M 卖/买比", "history": [{"date": "2024-01-31", "value": 1.8}, {"date": "2024-04-30", "value": 2.1}, {"date": "2024-07-31", "value": 2.4}, {"date": "2024-10-31", "value": 2.6}, {"date": "2025-01-31", "value": 2.8}, {"date": "2025-04-30", "value": 3.1}, {"date": "2025-07-31", "value": 3.5}, {"date": "2025-10-31", "value": 3.8}, {"date": "2026-01-31", "value": 3.5}, {"date": "2026-04-30", "value": 3.2}], "alert": 3.0, "danger": 5.0, "dotcom_peak": 4.0, "current_value": 3.2, "unit": "x", "direction": "lower_is_better"}];
+const indexScoreDetails = [{"key": "capex_revenue", "value": 2.5738223057657152, "score": 43.0, "weight": 0.25, "weighted_score": 10.7}, {"key": "shiller_cape", "value": 41.71, "score": 91.8, "weight": 0.2, "weighted_score": 18.4}, {"key": "mag7_concentration", "value": 32.4, "score": 49.7, "weight": 0.15, "weighted_score": 7.5}, {"key": "semiconductor_proxy", "value": -1.0852713178294573, "score": 26.1, "weight": 0.2, "weighted_score": 5.2}, {"key": "insider_sell_ratio", "value": 3.2, "score": 55.0, "weight": 0.2, "weighted_score": 11.0}];
+const indexHistory = [{"date": "2026-06-21", "value": 52.77928987197978}, {"date": "2026-06-21", "value": 52.77928987197978}, {"date": "2026-06-21", "value": 52.77928987197978}, {"date": "2026-06-21", "value": 52.77928987197978}, {"date": "2026-06-21", "value": 52.77928987197978}, {"date": "2026-06-21", "value": 52.77928987197978}, {"date": "2026-06-21", "value": 52.77928987197978}, {"date": "2026-06-21", "value": 52.77928987197978}, {"date": "2026-06-21", "value": 52.77928987197978}, {"date": "2026-06-21", "value": 52.77928987197978}, {"date": "2026-06-21", "value": 52.77928987197978}, {"date": "2026-06-21", "value": 67.55965162908572}, {"date": "2026-06-21", "value": 59.25538937049547}, {"date": "2026-06-21", "value": 67.74731918031598}, {"date": "2026-06-21", "value": 67.74731918031598}, {"date": "2026-06-21", "value": 53.951953976607534}, {"date": "2026-06-21", "value": 50.13093707230057}, {"date": "2026-06-21", "value": 37.26858243399068}, {"date": "2026-06-21", "value": 39.55587175578118}];
+
+const COLORS = {
+    red: '#ef4444', yellow: '#f59e0b', green: '#10b981', gray: '#6b7280',
+    alert: '#f59e0b', danger: '#ef4444', dotcom: '#a78bfa',
+    green_band: '#10b981', blue_band: '#3b82f6',
+    yellow_band: '#f59e0b', orange_band: '#ea580c', red_band: '#dc2626',
+};
+
+const STATUS_LABEL = {
+    red: '危险', yellow: '警觉', green: '健康', gray: '数据缺失'
+};
+
+function formatValue(value, unit) {
+    if (value === null || value === undefined) return '—';
+    if (unit === '%') return value.toFixed(1) + '%';
+    if (unit === 'x') return value.toFixed(2) + 'x';
+    return value.toFixed(2);
+}
+
+function getBandColor(score) {
+    if (score >= 80) return COLORS.red_band;
+    if (score >= 60) return COLORS.orange_band;
+    if (score >= 40) return COLORS.yellow_band;
+    if (score >= 20) return COLORS.blue_band;
+    return COLORS.green_band;
+}
+
+// ===== 半圆 gauge 指针 (动画) =====
+const idxScore = parseFloat(document.querySelector('.gauge-score .value').textContent);
+const needle = document.getElementById('gauge-needle');
+if (!isNaN(idxScore) && needle) {
+    // score 0 → -90° (指左), score 50 → 0° (指上), score 100 → +90° (指右)
+    const targetAngle = idxScore * 1.8 - 90;
+    // 初始位置: 已经在 HTML 里硬编码为 -90° (指左)
+    // 加 CSS transition 动画
+    needle.style.transition = 'transform 1.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    // 0.3s 后开始动画 (确保 DOM 完全渲染)
+    setTimeout(() => {
+        needle.setAttribute('transform', `rotate(${targetAngle.toFixed(1)} 160 140)`);
+    }, 300);
+}
+
+// ===== 指标评分明细 =====
+const scoreDetailsDiv = document.getElementById('score-details');
+if (indexScoreDetails.length === 0) {
+    scoreDetailsDiv.innerHTML = '<div style="color: #64748b; text-align: center; padding: 32px;">数据不足，无法计算指数</div>';
+} else {
+    const metricNames = {
+        'capex_revenue': 'AI Capex/收入',
+        'shiller_cape': 'Shiller CAPE',
+        'mag7_concentration': 'Mag 7 集中度',
+        'gpu_spot_decline': 'GPU 云租价格',
+        'insider_sell_ratio': '内部人卖/买比',
+        'retail_margin_growth': 'FINRA 保证金',
+        'capex_vs_revenue_growth': 'Capex 增速比',
+    };
+    scoreDetailsDiv.innerHTML = indexScoreDetails.map(m => {
+        const color = getBandColor(m.score);
+        return `
+            <div class="score-bar-row">
+                <div class="score-bar-label">${metricNames[m.key] || m.key}</div>
+                <div class="score-bar-bg">
+                    <div class="score-bar-fill" style="width: ${m.score}%; background: ${color};"></div>
+                </div>
+                <div class="score-bar-value" style="color: ${color};">${m.score.toFixed(1)}</div>
+                <div class="score-bar-weight">× ${(m.weight*100).toFixed(0)}%</div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ===== 5 指标卡片 =====
+function renderCard(metric) {
+    const status = metric.status;
+    const dotcomTxt = metric.dotcom_peak
+        ? `dot-com 峰值: ${formatValue(metric.dotcom_peak, metric.unit)}` : '';
+    return `
+        <div class="metric-card ${status}">
+            <div class="metric-header">
+                <div>
+                    <div class="metric-name">${metric.name_zh}</div>
+                    <div class="metric-name-en">${metric.name_en}</div>
+                </div>
+                <span class="status-badge ${status}">${STATUS_LABEL[status]}</span>
+            </div>
+            <div class="metric-value">
+                ${formatValue(metric.value, metric.unit)}
+            </div>
+            <div class="metric-desc">${metric.desc}</div>
+            <div class="threshold-row">
+                <span class="label">警觉线</span>
+                <span>${formatValue(metric.alert_value, metric.unit)}</span>
+            </div>
+            <div class="threshold-row">
+                <span class="label">危险线</span>
+                <span>${formatValue(metric.danger_value, metric.unit)}</span>
+            </div>
+            ${dotcomTxt ? `<div class="threshold-row">
+                <span class="label">历史峰值</span>
+                <span>${dotcomTxt}</span>
+            </div>` : ''}
+            <div class="metric-meta">
+                <span class="tag">来源: ${metric.source}</span>
+                <span class="tag">频率: ${metric.update_freq}</span>
+                <span class="tag">观测: ${metric.obs_date || '—'}</span>
+                ${metric.obs_period ? `<span class="tag">周期: ${metric.obs_period}</span>` : ''}
+            </div>
+            <div class="chart-container" id="chart-${metric.metric_key}"></div>
+        </div>
+    `;
+}
+
+const grid = document.getElementById('metrics-grid');
+grid.innerHTML = metrics.map(renderCard).join('');
+
+// 简易 SVG 折线图
+function renderChart(container, data, alert, danger, dotcom, direction, unit) {
+    if (!data || data.length < 2) {
+        container.innerHTML = '<div style="text-align:center;color:#64748b;line-height:120px;font-size:12px;">数据不足</div>';
+        return;
+    }
+    const w = 360, h = 120, pad = 8;
+    const values = data.map(d => d.value);
+    const min = Math.min(...values, alert, danger, dotcom || 999);
+    const max = Math.max(...values, alert, danger, dotcom || 0);
+    const range = (max - min) || 1;
+    const xStep = (w - 2 * pad) / (data.length - 1);
+    const points = data.map((d, i) => {
+        const x = pad + i * xStep;
+        const y = h - pad - ((d.value - min) / range) * (h - 2 * pad);
+        return { x, y, value: d.value, date: d.date };
+    });
+    const linePath = points.map((p, i) => (i === 0 ? 'M' : 'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
+    const areaPath = linePath + ` L${points[points.length-1].x.toFixed(1)},${h-pad} L${points[0].x.toFixed(1)},${h-pad} Z`;
+    const yAlert = h - pad - ((alert - min) / range) * (h - 2 * pad);
+    const yDanger = h - pad - ((danger - min) / range) * (h - 2 * pad);
+    const yDotcom = dotcom ? h - pad - ((dotcom - min) / range) * (h - 2 * pad) : null;
+    const lastPoint = points[points.length - 1];
+    const lastColor = lastPoint.value >= danger ? COLORS.danger
+                    : lastPoint.value >= alert ? COLORS.alert : COLORS.green;
+    container.innerHTML = `
+        <svg viewBox="0 0 ${w} ${h}" width="100%" height="100%" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="grad-${container.id}" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="${lastColor}" stop-opacity="0.3"/>
+                    <stop offset="100%" stop-color="${lastColor}" stop-opacity="0"/>
+                </linearGradient>
+            </defs>
+            <path d="${areaPath}" fill="url(#grad-${container.id})"/>
+            <path d="${linePath}" fill="none" stroke="${lastColor}" stroke-width="1.5"/>
+            <line x1="${pad}" y1="${yDanger}" x2="${w-pad}" y2="${yDanger}" stroke="${COLORS.danger}" stroke-width="0.8" stroke-dasharray="3,2" opacity="0.6"/>
+            <line x1="${pad}" y1="${yAlert}" x2="${w-pad}" y2="${yAlert}" stroke="${COLORS.alert}" stroke-width="0.8" stroke-dasharray="3,2" opacity="0.6"/>
+            ${yDotcom ? `<line x1="${pad}" y1="${yDotcom}" x2="${w-pad}" y2="${yDotcom}" stroke="${COLORS.dotcom}" stroke-width="0.6" stroke-dasharray="2,2" opacity="0.4"/>` : ''}
+            <circle cx="${lastPoint.x}" cy="${lastPoint.y}" r="2.5" fill="${lastColor}"/>
+        </svg>
+    `;
+}
+
+chartData.forEach(cd => {
+    const el = document.getElementById(`chart-${cd.key}`);
+    if (el) renderChart(el, cd.history, cd.alert, cd.danger, cd.dotcom_peak, cd.direction, cd.unit);
+});
+
+// 5 大指标明细 + 指数大圆盘 — 这是当前主视图
+// 回测图已删除（5 指标 vs 2 指标回测数据口径不一致，无对比意义）
+</script>
+</body>
+</html>

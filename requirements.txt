@@ -1,0 +1,6 @@
+# AI 泡沫监控仪表盘 - 依赖
+# 标准库：sqlite3, json, datetime, os, sys, logging, argparse — 无需安装
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+yfinance>=0.2.40
+jinja2>=3.1.0

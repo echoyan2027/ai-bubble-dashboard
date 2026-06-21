@@ -1,0 +1,70 @@
+name: Update AI Bubble Dashboard
+
+on:
+  # 每周一 09:00 UTC 自动更新 (=北京时间 17:00)
+  schedule:
+    - cron: "0 9 * * 1"
+  # 允许在 GitHub 网页手动触发
+  workflow_dispatch:
+    inputs:
+      skip_heavy:
+        description: '跳过重任务 (SEC EDGAR/Yahoo)'
+        required: false
+        default: 'false'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install xlrd==1.2.0  # Yale xls 解析
+
+      - name: Backfill historical data (one-time seed)
+        run: |
+          python -c "
+          import sys
+          sys.path.insert(0, '.')
+          from fetchers.historical import backfill_shiller_history, backfill_sp500_history
+          backfill_shiller_history()
+          backfill_sp500_history()
+          "
+        continue-on-error: true
+
+      - name: Update dashboard
+        env:
+          SKIP_HEAVY: ${{ github.event.inputs.skip_heavy }}
+        run: |
+          if [ "$SKIP_HEAVY" = "true" ]; then
+            python update.py --render-only
+          else
+            python update.py
+          fi
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/ logs/
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: auto-update dashboard [$(date -u +'%Y-%m-%dT%H:%M:%SZ')]"
+            git push
+          fi

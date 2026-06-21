@@ -1,0 +1,211 @@
+[
+  {
+    "period": "2025Q4",
+    "end": "2025-12-31",
+    "hyperscaler_capex_b": 118.63,
+    "total_revenue_b": 354.55,
+    "ai_revenue_b": 46.09,
+    "ratio": 2.5738,
+    "ai_revenue_fraction": 0.13,
+    "source": "sec_edgar_auto",
+    "added_at": "2026-06-21"
+  },
+  {
+    "period": "2025Q3",
+    "end": "2025-09-30",
+    "hyperscaler_capex_b": 97.27,
+    "total_revenue_b": 309.08,
+    "ai_revenue_b": 40.18,
+    "ratio": 2.4208,
+    "ai_revenue_fraction": 0.13,
+    "source": "sec_edgar_auto",
+    "added_at": "2026-06-21"
+  },
+  {
+    "period": "2025Q2",
+    "end": "2025-06-30",
+    "hyperscaler_capex_b": 88.25,
+    "total_revenue_b": 291.66,
+    "ai_revenue_b": 37.92,
+    "ratio": 2.3274,
+    "ai_revenue_fraction": 0.13,
+    "source": "sec_edgar_auto",
+    "added_at": "2026-06-21"
+  },
+  {
+    "period": "2025Q1",
+    "end": "2025-03-31",
+    "hyperscaler_capex_b": 53.36,
+    "total_revenue_b": 334.55,
+    "ai_revenue_b": 43.49,
+    "ratio": 1.2269,
+    "ai_revenue_fraction": 0.13,
+    "source": "sec_edgar_auto",
+    "added_at": "2026-06-21"
+  },
+  {
+    "period": "2024Q4",
+    "end": "2024-12-31",
+    "hyperscaler_capex_b": 72.34,
+    "total_revenue_b": 402.28,
+    "ai_revenue_b": 52.3,
+    "ratio": 1.3833,
+    "ai_revenue_fraction": 0.13,
+    "source": "sec_edgar_auto",
+    "added_at": "2026-06-21"
+  },
+  {
+    "period": "2024Q3",
+    "end": "2024-09-30",
+    "hyperscaler_capex_b": 58.86,
+    "total_revenue_b": 353.32,
+    "ai_revenue_b": 45.93,
+    "ratio": 1.2815,
+    "ai_revenue_fraction": 0.13,
+    "source": "sec_edgar_auto",
+    "added_at": "2026-06-21"
+  },
+  {
+    "period": "2024Q2",
+    "end": "2024-06-30",
+    "hyperscaler_capex_b": 52.85,
+    "total_revenue_b": 336.52,
+    "ai_revenue_b": 43.75,
+    "ratio": 1.2081,
+    "ai_revenue_fraction": 0.13,
+    "source": "sec_edgar_auto",
+    "added_at": "2026-06-21"
+  },
+  {
+    "period": "2024Q1",
+    "end": "2024-03-31",
+    "hyperscaler_capex_b": 33.21,
+    "total_revenue_b": 305.48,
+    "ai_revenue_b": 39.71,
+    "ratio": 0.8363,
+    "ai_revenue_fraction": 0.13,
+    "source": "sec_edgar_auto",
+    "added_at": "2026-06-21"
+  },
+  {
+    "period": "2023Q4",
+    "end": "2023-12-31",
+    "hyperscaler_capex_b": 42.93,
+    "total_revenue_b": 358.4,
+    "ai_revenue_b": 46.59,
+    "ratio": 0.9215,
+    "ai_revenue_fraction": 0.13,
+    "source": "sec_edgar_auto",
+    "added_at": "2026-06-21"
+  },
+  {
+    "period": "2023Q3",
+    "end": "2023-09-30",
+    "hyperscaler_capex_b": 36.95,
+    "total_revenue_b": 310.44,
+    "ai_revenue_b": 40.36,
+    "ratio": 0.9155,
+    "ai_revenue_fraction": 0.13,
+    "source": "sec_edgar_auto",
+    "added_at": "2026-06-21"
+  },
+  {
+    "period": "2023Q2",
+    "end": "2023-06-30",
+    "hyperscaler_capex_b": 33.42,
+    "total_revenue_b": 297.18,
+    "ai_revenue_b": 38.63,
+    "ratio": 0.8651,
+    "ai_revenue_fraction": 0.13,
+    "source": "sec_edgar_auto",
+    "added_at": "2026-06-21"
+  },
+  {
+    "period": "2023Q1",
+    "end": "2023-03-31",
+    "hyperscaler_capex_b": 26.83,
+    "total_revenue_b": 262.98,
+    "ai_revenue_b": 34.19,
+    "ratio": 0.7848,
+    "ai_revenue_fraction": 0.13,
+    "source": "sec_edgar_auto",
+    "added_at": "2026-06-21"
+  },
+  {
+    "period": "2022Q4",
+    "end": "2022-12-31",
+    "hyperscaler_capex_b": 39.5,
+    "total_revenue_b": 310.16,
+    "ai_revenue_b": 40.32,
+    "ratio": 0.9797,
+    "ai_revenue_fraction": 0.13,
+    "source": "sec_edgar_auto",
+    "added_at": "2026-06-21"
+  },
+  {
+    "period": "2022Q3",
+    "end": "2022-09-30",
+    "hyperscaler_capex_b": 39.31,
+    "total_revenue_b": 274.03,
+    "ai_revenue_b": 35.62,
+    "ratio": 1.1035,
+    "ai_revenue_fraction": 0.13,
+    "source": "sec_edgar_auto",
+    "added_at": "2026-06-21"
+  },
+  {
+    "period": "2022Q2",
+    "end": "2022-06-30",
+    "hyperscaler_capex_b": 36.99,
+    "total_revenue_b": 271.61,
+    "ai_revenue_b": 35.31,
+    "ratio": 1.0478,
+    "ai_revenue_fraction": 0.13,
+    "source": "sec_edgar_auto",
+    "added_at": "2026-06-21"
+  },
+  {
+    "period": "2022Q1",
+    "end": "2022-03-31",
+    "hyperscaler_capex_b": 34.64,
+    "total_revenue_b": 255.9,
+    "ai_revenue_b": 33.27,
+    "ratio": 1.0412,
+    "ai_revenue_fraction": 0.13,
+    "source": "sec_edgar_auto",
+    "added_at": "2026-06-21"
+  },
+  {
+    "period": "2021Q4",
+    "end": "2021-12-31",
+    "hyperscaler_capex_b": 36.58,
+    "total_revenue_b": 298.14,
+    "ai_revenue_b": 38.76,
+    "ratio": 0.9439,
+    "ai_revenue_fraction": 0.13,
+    "source": "sec_edgar_auto",
+    "added_at": "2026-06-21"
+  },
+  {
+    "period": "2021Q3",
+    "end": "2021-09-30",
+    "hyperscaler_capex_b": 32.72,
+    "total_revenue_b": 250.26,
+    "ai_revenue_b": 32.53,
+    "ratio": 1.0058,
+    "ai_revenue_fraction": 0.13,
+    "source": "sec_edgar_auto",
+    "added_at": "2026-06-21"
+  },
+  {
+    "period": "2021Q2",
+    "end": "2021-06-30",
+    "hyperscaler_capex_b": 30.88,
+    "total_revenue_b": 250.19,
+    "ai_revenue_b": 32.52,
+    "ratio": 0.9493,
+    "ai_revenue_fraction": 0.13,
+    "source": "sec_edgar_auto",
+    "added_at": "2026-06-21"
+  }
+]

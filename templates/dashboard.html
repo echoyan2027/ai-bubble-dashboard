@@ -375,6 +375,50 @@ h1 { font-size: 28px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; }
     .index-section { grid-template-columns: 1fr; }
     .history-section { grid-template-columns: 1fr; }
 }
+
+/* ===== 手机端 (≤ 768px) ===== */
+@media (max-width: 768px) {
+    body { padding: 12px; }
+    .header, .disclaimer, .update-info, .index-circle-card,
+    .index-details-card, .metric-card, .history-card { padding: 16px; }
+    h1 { font-size: 20px; }
+    .subtitle { font-size: 12px; }
+    .eval-date { font-size: 11px; padding: 3px 8px; }
+    .disclaimer { font-size: 12px; }
+
+    /* gauge 数字小一点 */
+    .gauge-score .value { font-size: 40px; }
+    .gauge-score .label { font-size: 9px; }
+    .band-label { font-size: 18px; }
+
+    /* 5 个指标卡片单列 */
+    .metrics-grid { grid-template-columns: 1fr; }
+    .metric-value { font-size: 24px; }
+    .metric-value .unit { font-size: 13px; }
+
+    /* 指标详情条：标签/条/分数 保留，权重列隐藏 */
+    .score-bar-row {
+        grid-template-columns: 1fr 56px;
+        gap: 8px;
+        row-gap: 4px;
+    }
+    .score-bar-row .score-bar-label { grid-column: 1 / 2; font-size: 12px; }
+    .score-bar-row .score-bar-value { grid-column: 2 / 3; }
+    .score-bar-row .score-bar-bg { grid-column: 1 / 2; height: 12px; }
+    .score-bar-row .score-bar-weight { display: none; }
+
+    /* 历史图小一点 */
+    .history-chart { height: 200px; }
+    .backtest-table { font-size: 12px; }
+    .backtest-table th, .backtest-table td { padding: 6px 8px; }
+
+    /* 头部：日期徽章换行 */
+    .header { padding-bottom: 12px; }
+    .header .eval-date { display: block; width: max-content; margin-top: 8px; }
+
+    /* footer 文字小一点 */
+    .footer { font-size: 11px; padding: 16px 0; }
+}
 </style>
 </head>
 <body>

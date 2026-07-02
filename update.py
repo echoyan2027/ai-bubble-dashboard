@@ -108,6 +108,11 @@ def main():
     parser.add_argument("--quiet", action="store_true", help="静默模式")
     args = parser.parse_args()
 
+    # 关键修复: 不管用户从哪个目录运行 update.py, 都先把 CWD 切到脚本所在目录
+    # 这样 data/dashboard.html 相对路径和 templates/dashboard.html 都能找到
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(script_dir)
+
     setup_logging(verbose=not args.quiet)
     logger = logging.getLogger("update")
 

@@ -325,6 +325,7 @@ def fetch_capex_revenue() -> dict:
 
     # 算 Mag 4 季度合计
     # 统一按"披露季度 end 日期"对齐
+    # 修复: 容忍 ≤4 家不齐 (例如 MSFT 2026Q1 SEC 还没同步)
     all_ends = set()
     for ticker in ["MSFT", "AMZN", "GOOGL", "META"]:
         ck = db.get_history(f"capex_{ticker.lower()}", limit=20)
@@ -339,21 +340,30 @@ def fetch_capex_revenue() -> dict:
         capex_sum = 0
         rev_sum = 0
         present = 0
+        missing = []
         for ticker in ["MSFT", "AMZN", "GOOGL", "META"]:
             ck = db.get_history(f"capex_{ticker.lower()}", limit=20)
             rk = db.get_history(f"rev_{ticker.lower()}", limit=20)
+            has_capex = False
+            has_rev = False
             for x in ck:
                 if x["obs_date"] == end:
                     capex_sum += x["value"]
                     present += 1
+                    has_capex = True
                     break
             for x in rk:
                 if x["obs_date"] == end:
                     rev_sum += x["value"]
+                    has_rev = True
                     break
+            if not (has_capex and has_rev):
+                missing.append(ticker)
 
-        # 要求 4 家都有数据
-        if present < 4 or capex_sum == 0 or rev_sum == 0:
+        # 关键修复: 至少 3 家有数据即可 (原来要 4 家)
+        # 但要在 source 字段标记是否完整, 方便用户判断
+        is_complete = (present == 4)
+        if present < 3 or capex_sum == 0 or rev_sum == 0:
             continue
 
         ai_revenue = rev_sum * AI_REVENUE_FRACTION
@@ -364,6 +374,14 @@ def fetch_capex_revenue() -> dict:
         quarter = (month - 1) // 3 + 1
         period_label = f"{year}Q{quarter}"
 
+        # 部分数据时加 * 后缀
+        if not is_complete:
+            period_label = f"{period_label}*"
+
+        source_tag = f"sec_edgar_auto"
+        if not is_complete:
+            source_tag = f"sec_edgar_auto_partial({present}/4, missing: {','.join(missing)})"
+
         quarterly_rows.append({
             "period": period_label,
             "end": end,
@@ -372,15 +390,15 @@ def fetch_capex_revenue() -> dict:
             "ai_revenue_b": round(ai_revenue, 2),
             "ratio": round(ratio, 4),
             "ai_revenue_fraction": AI_REVENUE_FRACTION,
-            "source": "sec_edgar_auto",
+            "source": source_tag,
             "added_at": date.today().isoformat(),
         })
         db.insert_data(
             "capex_revenue", ratio, obs_date=end, obs_period=period_label,
-            source="sec_edgar_auto",
+            source=source_tag,
             raw_payload={
                 "capex_b": capex_sum, "ai_rev_b": ai_revenue, "ratio": ratio,
-                "fraction": AI_REVENUE_FRACTION,
+                "fraction": AI_REVENUE_FRACTION, "present": present, "missing": missing,
             },
         )
 

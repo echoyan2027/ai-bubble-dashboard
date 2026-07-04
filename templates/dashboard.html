@@ -263,6 +263,21 @@ h1 { font-size: 28px; font-weight: 700; color: #f1f5f9; margin-bottom: 4px; }
 .metric-card.yellow { border-left: 4px solid #f59e0b; }
 .metric-card.green { border-left: 4px solid #10b981; }
 .metric-card.gray { border-left: 4px solid #6b7280; }
+.metric-card.supplementary {
+    background: linear-gradient(135deg, rgba(99,102,241,0.04) 0%, rgba(99,102,241,0.01) 100%);
+    border-left-color: rgba(99,102,241,0.5);
+}
+.supp-badge {
+    display: inline-block;
+    background: #6366f1;
+    color: #fff;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+    font-weight: 600;
+    vertical-align: middle;
+}
 
 .metric-header {
     display: flex;
@@ -622,24 +637,15 @@ if (indexScoreDetails.length === 0) {
     }).join('');
 }
 
-// ===== 5 指标卡片 =====
+// ===== 指标卡片 (5 主指标 + 2 补充指标) =====
 function renderCard(metric) {
     const status = metric.status;
     const dotcomTxt = metric.dotcom_peak
         ? `dot-com 峰值: ${formatValue(metric.dotcom_peak, metric.unit)}` : '';
-    return `
-        <div class="metric-card ${status}">
-            <div class="metric-header">
-                <div>
-                    <div class="metric-name">${metric.name_zh}</div>
-                    <div class="metric-name-en">${metric.name_en}</div>
-                </div>
-                <span class="status-badge ${status}">${STATUS_LABEL[status]}</span>
-            </div>
-            <div class="metric-value">
-                ${formatValue(metric.value, metric.unit)}
-            </div>
-            <div class="metric-desc">${metric.desc}</div>
+    const isSupp = metric.is_supplementary === true;
+    const cardClass = isSupp ? `metric-card ${status} supplementary` : `metric-card ${status}`;
+    const suppBadge = isSupp ? '<span class="supp-badge">补充</span>' : '';
+    const thresholdBlock = isSupp ? '' : `
             <div class="threshold-row">
                 <span class="label">警觉线</span>
                 <span>${formatValue(metric.alert_value, metric.unit)}</span>
@@ -651,7 +657,21 @@ function renderCard(metric) {
             ${dotcomTxt ? `<div class="threshold-row">
                 <span class="label">历史峰值</span>
                 <span>${dotcomTxt}</span>
-            </div>` : ''}
+            </div>` : ''}`;
+    return `
+        <div class="${cardClass}">
+            <div class="metric-header">
+                <div>
+                    <div class="metric-name">${metric.name_zh}${suppBadge}</div>
+                    <div class="metric-name-en">${metric.name_en}</div>
+                </div>
+                <span class="status-badge ${status}">${STATUS_LABEL[status]}</span>
+            </div>
+            <div class="metric-value">
+                ${formatValue(metric.value, metric.unit)}
+            </div>
+            <div class="metric-desc">${metric.desc}</div>
+            ${thresholdBlock}
             <div class="metric-meta">
                 <span class="tag">来源: ${metric.source}</span>
                 <span class="tag">频率: ${metric.update_freq}</span>

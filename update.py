@@ -25,6 +25,8 @@ from fetchers import (
     fetch_capex_revenue,
     fetch_semiconductor_proxy,
     fetch_insider_sell_ratio,
+    fetch_storage_proxy,
+    fetch_ai_upstream_profit,
 )
 
 
@@ -93,6 +95,23 @@ def run_all(auto_only: bool = False):
     except Exception as e:
         logger.error(f"  ✗ {e}")
         results["capex_revenue"] = {"error": str(e)}
+
+    # 补充指标（不进主 index, 仅作背景观察）
+    logger.info("[+] 抓取存储紧缺度代理 (兆易创新/北京君正/紫光国微)...")
+    try:
+        results["storage_proxy"] = fetch_storage_proxy()
+        logger.info(f"  → {results['storage_proxy']}")
+    except Exception as e:
+        logger.error(f"  ✗ {e}")
+        results["storage_proxy"] = {"error": str(e)}
+
+    logger.info("[+] 抓取 AI 上游利润占比 (SEC EDGAR)...")
+    try:
+        results["ai_upstream_profit"] = fetch_ai_upstream_profit()
+        logger.info(f"  → {results['ai_upstream_profit']}")
+    except Exception as e:
+        logger.error(f"  ✗ {e}")
+        results["ai_upstream_profit"] = {"error": str(e)}
 
     return results
 

@@ -91,6 +91,37 @@ METRICS_META = [
         "category": "sentiment",
         "desc": "Mag 7 全部 6 个月滚动窗口内部人卖出金额除以买入金额。比值 1.0 持平，>3.0 内部人净卖出显著，>5.0 接近历史极端水平 (2007/2021 顶峰)。",
     },
+    # === 以下为补充指标（不进主 index 评分, 仅作背景观察）===
+    {
+        "metric_key": "storage_proxy",
+        "name_zh": "存储紧缺度代理 (兆易创新)",
+        "name_en": "Memory Tightness Proxy (GigaDevice MoM)",
+        "unit": "%",
+        "alert_value": -20.0,
+        "danger_value": -30.0,
+        "dotcom_peak": None,
+        "source": "新浪财经 K 线",
+        "direction": "lower_is_better",
+        "update_freq": "daily",
+        "category": "fundamental",
+        "is_supplementary": True,
+        "desc": "兆易创新 (603986.SH) 月末收盘价的月度变化率。国内 NOR Flash + 利基 DRAM 龙头, 是 DDR5/NAND 现货价的公开可获取代理。月环比 <0 表明存储现货价格见顶回落, 是周期顶部的领先信号。",
+    },
+    {
+        "metric_key": "ai_upstream_profit",
+        "name_zh": "AI 上游利润 / Mag 7 利润 (TTM)",
+        "name_en": "AI Upstream Profit / Mag 7 Profit (TTM)",
+        "unit": "%",
+        "alert_value": 30.0,
+        "danger_value": 45.0,
+        "dotcom_peak": None,
+        "source": "SEC EDGAR XBRL",
+        "direction": "lower_is_better",
+        "update_freq": "quarterly",
+        "category": "fundamental",
+        "is_supplementary": True,
+        "desc": "NVDA + AVGO + AMAT + LRCX + KLAC 五家 AI 上游核心企业过去 4 个季度的净利润合计, 除以 Mag 7 (AAPL/MSFT/GOOGL/AMZN/META/NVDA/TSLA) 同口径 TTM 净利润合计。比例 >30% 表明 AI 利润高度集中在上游设备/芯片厂, 是泡沫顶部特征。",
+    },
 ]
 
 
@@ -126,14 +157,16 @@ def evaluate() -> dict:
         latest = db.get_latest(meta["metric_key"])
         value = latest["value"] if latest else None
         status = _judge_status(meta, value)
-        if status == "red":
-            total_red += 1
-        elif status == "yellow":
-            total_yellow += 1
-        elif status == "green":
-            total_green += 1
-        else:
-            total_gray += 1
+        # 补充指标不计入红黄绿统计
+        if not meta.get("is_supplementary"):
+            if status == "red":
+                total_red += 1
+            elif status == "yellow":
+                total_yellow += 1
+            elif status == "green":
+                total_green += 1
+            else:
+                total_gray += 1
 
         metrics_status.append({
             **meta,

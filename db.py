@@ -11,7 +11,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-DB_PATH = "data/ai_bubble.db"
+# 关键修复: 用 __file__ 锁定 DB 绝对路径, 不受 CWD 影响
+_THIS_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(_THIS_DIR, "data", "ai_bubble.db")
 
 SCHEMA = """
 -- 指标元数据（阈值、单位、刷新频率等）

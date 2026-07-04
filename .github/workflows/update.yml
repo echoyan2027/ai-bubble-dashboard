@@ -1,9 +1,9 @@
 name: Update AI Bubble Dashboard
 
 on:
-  # 每周一 09:00 UTC 自动更新 (=北京时间 17:00)
+  # 每天 01:00 UTC 自动更新 (=北京时间 09:00)
   schedule:
-    - cron: "0 9 * * 1"
+    - cron: "0 1 * * *"
   # 允许在 GitHub 网页手动触发
   workflow_dispatch:
     inputs:

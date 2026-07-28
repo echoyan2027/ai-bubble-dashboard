@@ -8,7 +8,7 @@
     "ratio": 3.198,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto_partial(3/4, missing: MSFT,GOOGL)",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   },
   {
     "period": "2025Q4",
@@ -19,7 +19,7 @@
     "ratio": 2.5738,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   },
   {
     "period": "2025Q3",
@@ -30,7 +30,7 @@
     "ratio": 2.4208,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   },
   {
     "period": "2025Q2",
@@ -41,7 +41,7 @@
     "ratio": 2.3274,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   },
   {
     "period": "2025Q1",
@@ -52,7 +52,7 @@
     "ratio": 1.2269,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   },
   {
     "period": "2024Q4",
@@ -63,7 +63,7 @@
     "ratio": 1.3833,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   },
   {
     "period": "2024Q3",
@@ -74,7 +74,7 @@
     "ratio": 1.2815,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   },
   {
     "period": "2024Q2",
@@ -85,7 +85,7 @@
     "ratio": 1.2081,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   },
   {
     "period": "2024Q1",
@@ -96,7 +96,7 @@
     "ratio": 0.8363,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   },
   {
     "period": "2023Q4",
@@ -107,7 +107,7 @@
     "ratio": 0.9215,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   },
   {
     "period": "2023Q3",
@@ -118,7 +118,7 @@
     "ratio": 0.9155,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   },
   {
     "period": "2023Q2",
@@ -129,7 +129,7 @@
     "ratio": 0.8651,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   },
   {
     "period": "2023Q1",
@@ -140,7 +140,7 @@
     "ratio": 0.7848,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   },
   {
     "period": "2022Q4",
@@ -151,7 +151,7 @@
     "ratio": 0.9797,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   },
   {
     "period": "2022Q3",
@@ -162,7 +162,7 @@
     "ratio": 1.1035,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   },
   {
     "period": "2022Q2",
@@ -173,7 +173,7 @@
     "ratio": 1.0478,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   },
   {
     "period": "2022Q1",
@@ -184,7 +184,7 @@
     "ratio": 1.0412,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   },
   {
     "period": "2021Q4",
@@ -195,7 +195,7 @@
     "ratio": 0.9439,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   },
   {
     "period": "2021Q3",
@@ -206,7 +206,7 @@
     "ratio": 1.0058,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   },
   {
     "period": "2021Q2*",
@@ -217,6 +217,6 @@
     "ratio": 0.7804,
     "ai_revenue_fraction": 0.13,
     "source": "sec_edgar_auto_partial(3/4, missing: GOOGL)",
-    "added_at": "2026-07-27"
+    "added_at": "2026-07-28"
   }
 ]
